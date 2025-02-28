@@ -125,7 +125,7 @@ SERVER_EMAIL = 'DMOJ: Modern Online Judge <errors@dmoj.ca>'
 STATIC_ROOT = '/tmp/static'
 
 # URL to access static files.
-#STATIC_URL = '/static/'
+STATIC_URL = '/static/'
 
 # Uncomment to use hashed filenames with the cache framework.
 #STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
@@ -148,7 +148,7 @@ TERMS_OF_SERVICE_URL = '//dmoj.ca/tos/'  # Use a flatpage.
 BRIDGED_JUDGE_ADDRESS = [('localhost', 9999)]
 
 # The bridged daemon bind address and port to communicate with the site.
-#BRIDGED_DJANGO_ADDRESS = [('localhost', 9998)]
+BRIDGED_DJANGO_ADDRESS = [('localhost', 9998)]
 
 ## DMOJ features.
 # Set to True to enable full-text searching for problems.
@@ -180,7 +180,7 @@ BAD_MAIL_PROVIDERS = set()
 # i.e. the path to /channels/ exposed by the daemon, through whatever proxy setup you have.
 
 # Using our standard nginx configuration, these should be:
-#EVENT_DAEMON_GET = 'ws://<your domain>/event/'
+#EVENT_DAEMON_GET = 'ws://127.0.0.1:15100/event/'
 #EVENT_DAEMON_GET_SSL = 'wss://<your domain>/event/'  # Optional
 #EVENT_DAEMON_POLL = '/channels/'
 
@@ -191,8 +191,8 @@ BAD_MAIL_PROVIDERS = set()
 #EVENT_DAEMON_AMQP_EXCHANGE = '<AMQP exchange to use>'
 
 ## Celery
-#CELERY_BROKER_URL = 'redis://localhost:6379'
-#CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 
 ## CDN control.
 # Base URL for a copy of Ace editor.
