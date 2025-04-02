@@ -2,7 +2,7 @@
 
 ## Authentication
 
-### `POST /api/token`
+### `POST /api/token/`
 
 #### Request Payload
 
@@ -28,7 +28,7 @@ Use the `access_token` in the `Authorization` header for authenticated requests:
 Authorization: Bearer <access_token>
 ```
 
-### `POST /api/token/refresh`
+### `POST /api/token/refresh/`
 
 #### Request Payload
 
@@ -47,9 +47,11 @@ Authorization: Bearer <access_token>
 }
 ```
 
-## Problem Management
+# Problem Management
 
-### `POST /api/v2/problems/create`
+## Problem List View
+
+### `POST /api/v2/problems`
 
 #### Request Payload
 
@@ -116,5 +118,105 @@ Authorization: Bearer <access_token>
   "submission_source_visibility_mode": "F",
   "is_organization_private": false,
   "banned_users": []
+}
+```
+
+### GET /api/v2/problems
+
+Example: [/api/v2/problems?partial=True&type=Uncategorized](https://dmoj.ca/api/v2/problems?partial=True&type=Uncategorized)
+
+#### Basic filters
+
+- `partial` - boolean
+
+#### List filters
+
+- `code` - problem code
+- `group` - problem group full name
+- `type` - problem type full name
+- `organization` - organization id
+
+#### Additional filters
+
+- `search` - similar to a list filter, except searches for the list of parameters in the problem's name, code, and description.
+
+#### Object response
+
+```json
+{
+  "code": "<problem code>",
+  "name": "<problem name>",
+  "types": ["<list of type full name>"],
+  "group": "<problem group full name>",
+  "points": "<problem points>",
+  "partial": "<whether partials are enabled for this problem>",
+  "is_organization_private": "<whether the problem is private to organizations>",
+  "is_public": "<whether the problem is publicly visible>"
+}
+```
+
+## Problem Detail View
+
+### GET /api/v2/problem/<problem code>
+
+Example: [/api/v2/problem/helloworld](https://dmoj.ca/api/v2/problem/helloworld)
+
+#### Object response
+
+```json
+{
+  "code": "<problem code>",
+  "name": "<problem name>",
+  "authors": ["<list of author username>"],
+  "types": ["<list of type full name>"],
+  "group": "<problem group full name>",
+  "time_limit": "<problem time limit>",
+  "memory_limit": "<problem memory limit>",
+  "language_resource_limits": [
+    {
+      "language": "<language key>",
+      "time_limit": "<language-specific time limit>",
+      "memory_limit": "<language-specific memory limit>"
+    }
+  ],
+  "points": "<problem points>",
+  "partial": "<whether partials are enabled for this problem>",
+  "short_circuit": "<whether short circuit is enabled for this problem>",
+  "languages": ["<list of language key>"],
+  "is_organization_private": "<whether the problem is private to organizations>",
+  "organizations": ["<list of organization id>"],
+  "is_public": "<whether the problem is publicly visible>"
+}
+```
+
+#### Additional info
+
+`is_public`: Whether the problem is publicly visible to the organizations listed. If `is_organization_private` is `false`, the problem is visible to all users.
+
+### PUT /api/v2/problem/<problem code>
+
+#### Info
+
+- Follow Question POST Format
+- Need Token
+
+#### Object response
+
+**200 OK**
+
+- Change data similiar to a GET
+
+### DELETE /api/v2/problem/<problem code>
+
+- Need Token
+- No Payload
+
+#### Object response
+
+**204 No Content**
+
+```json
+{
+  "detail": "Problem deleted successfully."
 }
 ```
