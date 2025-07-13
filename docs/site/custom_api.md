@@ -13,7 +13,7 @@
 }
 ```
 
-#### Response
+#### Object Response
 
 ```json
 {
@@ -38,7 +38,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
-#### Response
+#### Object Response
 
 ```json
 {
@@ -84,7 +84,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
-#### Response
+#### Object Response
 
 **201 Created**
 
@@ -121,55 +121,28 @@ Authorization: Bearer <access_token>
 }
 ```
 
-### GET /api/v2/problems
-
-Example: [/api/v2/problems?partial=True&type=Uncategorized](https://dmoj.ca/api/v2/problems?partial=True&type=Uncategorized)
-
-#### Basic filters
-
-- `partial` - boolean
-
-#### List filters
-
-- `code` - problem code
-- `group` - problem group full name
-- `type` - problem type full name
-- `organization` - organization id
-
-#### Additional filters
-
-- `search` - similar to a list filter, except searches for the list of parameters in the problem's name, code, and description.
-
-#### Object response
-
-```json
-{
-  "code": "<problem code>",
-  "name": "<problem name>",
-  "types": ["<list of type full name>"],
-  "group": "<problem group full name>",
-  "points": "<problem points>",
-  "partial": "<whether partials are enabled for this problem>",
-  "is_organization_private": "<whether the problem is private to organizations>",
-  "is_public": "<whether the problem is publicly visible>"
-}
-```
-
 ## Problem Detail View
 
-### GET /api/v2/problem/<problem code>
+### `PUT /api/v2/problem/<problem code>`
 
-Example: [/api/v2/problem/helloworld](https://dmoj.ca/api/v2/problem/helloworld)
+#### Info
+
+- Follow Question POST Format
+- Need Token
 
 #### Object response
+
+**200 OK**
+
+- Changed data similiar to a GET
 
 ```json
 {
   "code": "<problem code>",
   "name": "<problem name>",
-  "authors": ["<list of author username>"],
-  "types": ["<list of type full name>"],
-  "group": "<problem group full name>",
+  "authors": ["<list of author id>"],
+  "types": ["<list of type id>"],
+  "group": "<problem group id>",
   "time_limit": "<problem time limit>",
   "memory_limit": "<problem memory limit>",
   "language_resource_limits": [
@@ -189,24 +162,7 @@ Example: [/api/v2/problem/helloworld](https://dmoj.ca/api/v2/problem/helloworld)
 }
 ```
 
-#### Additional info
-
-`is_public`: Whether the problem is publicly visible to the organizations listed. If `is_organization_private` is `false`, the problem is visible to all users.
-
-### PUT /api/v2/problem/<problem code>
-
-#### Info
-
-- Follow Question POST Format
-- Need Token
-
-#### Object response
-
-**200 OK**
-
-- Change data similiar to a GET
-
-### DELETE /api/v2/problem/<problem code>
+### `DELETE /api/v2/problem/<problem code>`
 
 - Need Token
 - No Payload
@@ -220,3 +176,255 @@ Example: [/api/v2/problem/helloworld](https://dmoj.ca/api/v2/problem/helloworld)
   "detail": "Problem deleted successfully."
 }
 ```
+## Problem Data
+Problem data contains the test cases for a problem
+
+### `GET /api/v2/problem/<problem code>/test_data`
+
+- Need Token of a user that is either the authour or the curator of this problem
+
+#### Object response
+
+**200 OK**
+```json
+{
+  "zipfile_exists": true,
+  "data": {
+    "problem_data": {
+      "zipfile": "<zipfile download url, you need token for this>",
+      "generator": "<path to generator or null>",
+      "output_prefix": "<output filename prefix or null>",
+      "output_limit": "<limit on output size or null>",
+      "feedback": "<feedback type or empty string>",
+      "checker": "<checker type, e.g., 'standard'>",
+      "unicode": "<true or false>",
+      "nobigmath": "<true or false>",
+      "checker_args": "<arguments to the checker or empty string>"
+    },
+    "test_cases": [
+      {
+        "id": "<test case ID>",
+        "input_file": "<input filename>",
+        "output_file": "<output filename>",
+        "type": "<type of test case 'C', 'S', 'E'>",
+        "order": "<test case order>",
+        "points": "<points>",
+        "is_pretest": "<true or false>"
+      }
+    ]
+  }
+}
+```
+
+### `PUT /api/v2/problem/<problem code>/test_data`
+
+- Need Token of a user that is either the authour or the curator of this problem
+
+Headers:
+- Authorization: Bearer <your_token>
+- Content-Type: multipart/form-data
+
+#### Request Payload
+| Field                        | Type    | Description                                          |
+| ---------------------------- | ------- | ---------------------------------------------------- |
+| `problem_data.zipfile`       | File    | Zip file containing the problem data                 |
+| `problem_data.generator`     | File    | (Optional) Generator file                            |
+| `problem_data.output_prefix` | String  | (Optional) Prefix for output files                   |
+| `problem_data.output_limit`  | Integer | (Optional) Output limit in bytes                     |
+| `problem_data.checker`       | Enum    | `'C'`, `'S'`, or `'E'`                               |
+| `problem_data.checker_args`  | String  | (Optional) Arguments passed to the checker           |
+| `problem_data.unicode`       | Boolean | (Optional) `true` or `false`, default `false`        |
+| `problem_data.nobigmath`     | Boolean | (Optional) `true` or `false`, default `false`        |
+| `test_cases[0].input_file`   | File    | Input file for the test case                         |
+| `test_cases[0].output_file`  | File    | Output file for the test case                        |
+| `test_cases[0].order`        | Integer | Order of execution (must be unique among test cases) |
+| `test_cases[0].points`       | Integer | Number of points awarded for this test case          |
+| `test_cases[1].input_file`   | File    | ... (repeatable for more test cases)                 |
+
+#### Object Response
+
+**200 OK**
+
+```json
+{
+    "detail": "Problem data saved successfully"
+}
+```
+#### Aditional Note
+for more info: 
+- [checker](../problem_format/custom_checkers)
+- [generator](../problem_format/generator)
+- [problem format](../problem_format/problem_format.md)
+
+
+### `POST /api/v2/problem/<Problem Code>/submit`
+#### Request Payload
+```json
+{
+    "source": "Your code",
+    "language": "<a number>",
+    "judge": "Test1" // judge code, you can leave this empty and it will be any judge
+}
+```
+#### Object Response
+```json
+{
+  "submission_id": "<your submission id>"
+}
+```
+
+#### Additional Notes
+- You can use your `submission_id` with this API [get submission with id](/site/api?id=apiv2submissionltsubmission-idgt)
+
+# User Management
+## User
+### `POST /api/v2/moodle-to-dmoj/`
+
+- Require an admin token
+
+#### Request Payload
+```json
+{
+    "provider": "moodle", // this one is permanently moodle for now
+    "id": ["<List of ids>"]
+}
+```
+#### Object Response
+```json
+{
+  "<Moodle id>": {
+    "profile_id": "<profile id on dmoj side>",
+    "user_id": "<user id on dmoj side, matched through UserSocialAuth table>"
+  }
+}
+```
+#### Additional detail
+- Most of API Requests with things like user id actually require `profile_id` instead
+
+### `POST /api/v2/users/create`
+
+- Need admin token
+
+#### Request Payload
+```json
+{
+    "<moodle_id>": {
+        "username": "",
+        "email": "",
+        "first_name": ""
+    },
+    "<moodle_id>": {
+        "username": "<username>",
+        "email": "fullfake@example.com",
+        "password": "Secret123!",
+        "first_name": "first name",
+        "last_name": "last name"
+    }
+}
+```
+#### Object Response
+```json
+{
+  "success":{
+    "<moodle_id>": {
+    }
+  },
+  "errors":{
+    "<moodle_id>": {
+    }
+  }
+}
+```
+## User Submission Data
+### `POST /api/v2/user/download-data`
+
+- Need a token, the api will get data according to the user of the token
+
+#### Request Payload
+```json
+{
+  "comment_download": true,
+  "submission_download": true,
+  "submission_problem_glob": "*",
+  "submission_results": ["AC"]
+}
+```
+
+#### Object Response
+```json
+{
+    "status": "started",
+    "progress_url": "/tasks/status/6d23f5c6-31f9-4e40-b4d1-58688561e843?message=%C4%90ang+chu%E1%BA%A9n+b%E1%BB%8B+d%E1%BB%AF+li%E1%BB%87u...&redirect=%2Fdata%2Fprepare%2F"
+}
+```
+
+### `GET /api/v2/user/download-data`
+
+- Need token
+
+#### Object Response
+```json
+{
+    "status": "<ready or not>",
+    "download_url": "<absolute url for zipfile>"
+}
+```
+
+#### Additional info
+- You need token for the `download_url` for the correct data
+
+# Organization Management
+## Organization List
+### `POST /api/v2/organizations`
+
+- Need Token with adequate permission
+
+#### Request Payload
+```json
+{
+  "name": "Sample Couse",
+  "slug": "sample",
+  "short_name": "SAM",
+  "about": "A sample org for testing.",
+  // "admins": ["<users' profile id>"], ignore unless you have organzation_admin permission, default will be token user
+  // "members": ["<users' profile id>"], // ignore unless you have organzation_admin permission, default will be token user
+  // "is_open": true, // ignore unless you have organzation_admin permission, default true
+  // "slots": 100, // ignore unless you have organzation_admin permission, default null
+  "access_code": "ABC1234"
+  // ,"logo_override_image": ""
+}
+```
+#### Object Response
+**200 OK**
+```json
+{
+    "id": 84,
+    "name": "Sample Couse",
+    "slug": "sample",
+    "short_name": "SAM",
+    "about": "A sample org for testing.",
+    "admins": [
+        1
+    ],
+    "members": [],
+    "creation_date": "2025-07-13T09:02:00.301399+07:00",
+    "is_open": true,
+    "slots": null,
+    "access_code": "ABC1234",
+    "logo_override_image": ""
+}
+```
+
+## Organization Detail
+### `GET /api/v2/organization/<OrganizationID>`
+- Need Token of author or Curator
+- It has the same Response as [Get Organization List](api.md#apiv2organizations) but only list the organization with this ID
+
+### `PUT /api/v2/organization/<OrganizationID>`
+- It has the same request payload and Response as [Create Organization](#post-apiv2organizations)
+
+### `DELETE /api/v2/organization/<OrganizationID>`
+- Need token of author or curator
+
+#### Object Response
+**204 No Content**
