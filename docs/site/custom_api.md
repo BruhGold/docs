@@ -274,7 +274,7 @@ for more info:
 ```
 
 #### Additional Notes
-- You can use your `submission_id` with this API [get submission with id](/site/api?id=apiv2submissionltsubmission-idgt)
+- You can use your `submission_id` with this API [get submission with id](site/api?id=apiv2submissionltsubmission-idgt)
 
 # User Management
 ## User
@@ -354,7 +354,7 @@ for more info:
 ```json
 {
     "status": "started",
-    "progress_url": "/tasks/status/6d23f5c6-31f9-4e40-b4d1-58688561e843?message=%C4%90ang+chu%E1%BA%A9n+b%E1%BB%8B+d%E1%BB%AF+li%E1%BB%87u...&redirect=%2Fdata%2Fprepare%2F"
+    "progress_url": "<absoulute url that display progress for preparing data>"
 }
 ```
 
@@ -418,7 +418,7 @@ for more info:
 ## Organization Detail
 ### `GET /api/v2/organization/<OrganizationID>`
 - Need Token of author or Curator
-- It has the same Response as [Get Organization List](api.md#apiv2organizations) but only list the organization with this ID
+- It has the same Response as [Get Organization List](site/api.md#apiv2organizations) but only list the organization with this ID
 
 ### `PUT /api/v2/organization/<OrganizationID>`
 - It has the same request payload and Response as [Create Organization](#post-apiv2organizations)

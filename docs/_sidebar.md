@@ -11,6 +11,7 @@
   - [SSL proxying for user content](site/ssl_content_proxy.md)
   - [User data downloads](site/user_data_download.md)
   - [API](site/api.md)
+  - [Custom API In Capstone](site/custom_api.md)
 
 - Judge
   - [Setting up a judge](judge/setting_up_a_judge.md)
