@@ -215,7 +215,7 @@ Problem data contains the test cases for a problem
   }
 }
 ```
-
+#### Ad
 ### `PUT /api/v2/problem/<problem code>/test_data`
 
 - Need Token of a user that is either the authour or the curator of this problem
@@ -327,6 +327,10 @@ for more info:
 {
   "success":{
     "<moodle_id>": {
+      "dmoj_uid": "<dmoj_uid>",
+      "dmoj_profile_uid": "<dmoj profile_uid>",
+      "username": "<dmoj user_name>",
+      "email": "<dmoj email>"  
     }
   },
   "errors":{
